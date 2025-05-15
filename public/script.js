@@ -200,17 +200,21 @@ document.addEventListener('DOMContentLoaded', () => {
         piezasRechazadas, piezasInspeccionadas
       })
     })
-    .then(res => res.json())
-    .then(response => {
-      alert('¡Formulario enviado y guardado en Excel!');
-      btn.disabled = false;
-      btn.textContent = 'Enviar';
-    })
-    .catch(err => {
-      console.error('Error al enviar datos:', err);
-      alert('Error al guardar el formulario.');
-      btn.disabled = false;
-      btn.textContent = 'Enviar';
-    });
+   .then(res => {
+  if (!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
+  return res.json();
+})
+.then(response => {
+  alert('¡Formulario enviado y guardado con éxito!');
+  btn.disabled = false;
+  btn.textContent = 'Enviar';
+})
+.catch(err => {
+  console.error('❌ Error al enviar datos:', err);
+  alert('⚠️ Error al guardar el formulario:\n' + err.message);
+  btn.disabled = false;
+  btn.textContent = 'Enviar';
+});
+
   });
 });
