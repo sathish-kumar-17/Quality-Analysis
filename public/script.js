@@ -194,29 +194,31 @@ document.addEventListener('DOMContentLoaded', () => {
 ) || 0;
 
     fetch('https://prod-168.westus.logic.azure.com:443/workflows/a470a8d232214a22919d616946bcb5a3/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=whE3tuFhuSUWGDsMRIHEKlDBk-z3Gu4-MS2xszbkXRE', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        item, supervisor, inspector, fecha,
-        rows, totalColumnas,
-        piezasRechazadas, piezasInspeccionadas
-      })
-    })
-   .then(res => {
-  if (!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
-  return res.json();
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    item, supervisor, inspector, fecha,
+    rows,
+    piezasRechazadas,
+    piezasInspeccionadas
+  })
 })
-.then(response => {
-  alert('¡Formulario enviado y guardado con éxito!');
-  btn.disabled = false;
-  btn.textContent = 'Enviar';
+.then(async res => {
+  if (!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
+  const text = await res.text();
+  if (!text) {
+    alert('✅ Formulario enviado correctamente (respuesta vacía del servidor)');
+    return;
+  }
+  const data = JSON.parse(text);
+  alert('✅ Formulario enviado y guardado con éxito!');
 })
 .catch(err => {
   console.error('❌ Error al enviar datos:', err);
   alert('⚠️ Error al guardar el formulario:\n' + err.message);
-  btn.disabled = false;
-  btn.textContent = 'Enviar';
 });
 
-  });
+});
 });
