@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#data-body tr:last-child td:nth-child(4) input').value
 ) || 0;
 
-    fetch('http://localhost:3000/submit', {
+    fetch('https://prod-168.westus.logic.azure.com:443/workflows/a470a8d232214a22919d616946bcb5a3/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=whE3tuFhuSUWGDsMRIHEKlDBk-z3Gu4-MS2xszbkXRE', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
