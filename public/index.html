@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabla de Inspección</title>
+  <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <div class="Main">
+      <div class="formTitle"><h5>Observaciones de Inspección</h5></div>
+      <div class="dataObes">
+        <div class="iteamNos"><label>Ítem:</label><span><input type="text" /></span></div>
+        <div class="iteamNos"><label>Supervisor/a:</label><span><input type="text" /></span></div>
+        <div class="iteamNos"><label>Inspector/a IF:</label><span><input type="text" /></span></div>
+        <div class="iteamNos"><label>Fecha:</label><span><input type="text" /></span></div>
+      </div>
+  
+      <div class="tabelData">
+        <table>
+          <thead>
+            <tr>
+              <td><b>No</b></td>
+              <td><b>Op</b></td>
+              <td>Costura abierta</td>
+              <td>Embolsado o fruncido</td>
+              <td>Operación fuera de medida o fuera de lugar</td>
+              <td>Operación incompleta</td>
+              <td>Operación omitida</td>
+              <td>Orilla al crudo</td>
+              <td>Pliegue</td>
+              <td>Saltos en puntadas</td>
+              <td>Defecto de Material</td>
+              <td>Mal planchado o arrugado</td>
+              <td>Rotos en la tela</td>
+              <td>Manchas en la tela</td>
+              <td>Componente no de acuerdo a la muestra estándar</td>
+              <td>Diferentes tonalidades en la tela</td>
+              <td>Otros (escribir el defecto)</td>
+              <td><b>Total</b></td>
+            </tr>
+          </thead>
+          <tbody id="data-body"></tbody>
+        </table>
+      </div>
+  
+      <!-- Submit Button -->
+      <div class="submit-button-container">
+        <button type="button" id="submitBtn">Enviar</button>
+      </div>
+      <script src="script.js"></script>
+    </div>
