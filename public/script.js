@@ -163,6 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+   
+
   document.getElementById('submitBtn').addEventListener('click', function () {
     const btn = this;
     btn.disabled = true;
