@@ -9,6 +9,7 @@ input[type="text"] {
   height: 36px; line-height: 36px; vertical-align: middle;
   min-width: 5ch; max-width: 100%;
 }
+
 input:focus-visible { outline: none; }
 table { border-collapse: collapse; width: 100%; }
 th, td {

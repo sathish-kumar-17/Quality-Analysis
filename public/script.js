@@ -163,17 +163,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-   
-
   document.getElementById('submitBtn').addEventListener('click', function () {
     const btn = this;
-    btn.disabled = true;
-    btn.textContent = 'Enviando...';
 
-    const item = document.querySelectorAll('.iteamNos input')[0].value.trim();
-    const supervisor = document.querySelectorAll('.iteamNos input')[1].value.trim();
-    const inspector = document.querySelectorAll('.iteamNos input')[2].value.trim();
-    const fecha = document.querySelectorAll('.iteamNos input')[3].value.trim();
+    // Clear any old error styling
+    document.querySelectorAll('.highlight-error').forEach(el => el.classList.remove('highlight-error'));
+
+    const item = document.querySelectorAll('.iteamNos input')[0];
+    const supervisor = document.querySelectorAll('.iteamNos input')[1];
+    const inspector = document.querySelectorAll('.iteamNos input')[2];
+    const fecha = document.querySelectorAll('.iteamNos input')[3];
+
+    const requiredFields = [item, supervisor, inspector, fecha];
+    let missingRequired = false;
+
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        field.classList.add('highlight-error');
+        missingRequired = true;
+      }
+    });
+
+    if (missingRequired) {
+      alert('⚠️ Por favor complete todos los campos requeridos: Ítem, Supervisor, Inspector y Fecha.');
+      return;
+    }
 
     const rows = [];
     document.querySelectorAll('#data-body tr.data-row').forEach((tr, idx) => {
@@ -182,43 +196,54 @@ document.addEventListener('DOMContentLoaded', () => {
       const defectos = Array.from(tds).slice(1, 16).map(td => parseInt(td.value) || 0);
       const totalFila = parseInt(tds[16].value) || 0;
 
-      rows.push({ no: idx + 1, op, defectos, totalFila });
+      const hasData = op || defectos.some(d => d > 0) || totalFila > 0;
+
+      if (hasData) {
+        rows.push({ no: idx + 1, op, defectos, totalFila });
+      }
     });
+
+    if (rows.length === 0) {
+      alert('⚠️ No se ingresaron datos válidos en ninguna fila. Por favor complete al menos una fila.');
+      return;
+    }
 
     const totalColumnas = Array.from(document.querySelectorAll('#column-total-row input'))
       .map(input => parseInt(input.value) || 0);
 
     const piezasRechazadas = parseInt(document.getElementById('piezas-rechazadas').value) || 0;
     const piezasInspeccionadas = parseInt(
-  document.querySelector('#data-body tr:last-child td:nth-child(4) input').value
-) || 0;
+      document.querySelector('#data-body tr:last-child td:nth-child(4) input').value
+    ) || 0;
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
 
     fetch('https://prod-168.westus.logic.azure.com:443/workflows/a470a8d232214a22919d616946bcb5a3/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=whE3tuFhuSUWGDsMRIHEKlDBk-z3Gu4-MS2xszbkXRE', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    item, supervisor, inspector, fecha,
-    rows,
-    piezasRechazadas,
-    piezasInspeccionadas
-  })
-})
-.then(async res => {
-  if (!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
-  const text = await res.text();
-  if (!text) {
-    alert('✅ Formulario enviado correctamente (respuesta vacía del servidor)');
-    return;
-  }
-  const data = JSON.parse(text);
-  alert('✅ Formulario enviado y guardado con éxito!');
-})
-.catch(err => {
-  console.error('❌ Error al enviar datos:', err);
-  alert('⚠️ Error al guardar el formulario:\n' + err.message);
-});
-
-});
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        item: item.value.trim(),
+        supervisor: supervisor.value.trim(),
+        inspector: inspector.value.trim(),
+        fecha: fecha.value.trim(),
+        rows,
+        piezasRechazadas,
+        piezasInspeccionadas
+      })
+    })
+      .then(async res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
+        await res.text();
+        alert('✅ Formulario enviado y guardado con éxito!');
+      })
+      .catch(err => {
+        console.error('❌ Error al enviar datos:', err);
+        alert('⚠️ Error al guardar el formulario:\n' + err.message);
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = 'Enviar';
+      });
+  });
 });
