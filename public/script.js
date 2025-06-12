@@ -132,6 +132,24 @@ function createFinalRow() {
   return row;
 }
 
+function resetFormData() {
+  const confirmClear = confirm('¿Desea limpiar el formulario ahora?');
+  if (!confirmClear) return;
+
+  document.querySelectorAll('.iteamNos input').forEach(input => input.value = '');
+  document.querySelectorAll('#data-body tr.data-row').forEach(row => {
+    row.querySelectorAll('input[type="text"]').forEach(input => {
+      if (!input.hasAttribute('readonly')) input.value = '';
+      autoExpandInput(input);
+    });
+    calculateRowTotal(row);
+  });
+  calculateColumnTotals();
+
+  const piezasInspeccionadasInput = document.querySelector('#data-body tr:last-child td:nth-child(4) input');
+  if (piezasInspeccionadasInput) piezasInspeccionadasInput.value = '';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const tbody = document.getElementById('data-body');
   for (let i = 1; i <= 25; i++) tbody.appendChild(createRow(i));
@@ -225,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
         await res.text();
         alert('✅ Formulario enviado y guardado con éxito!');
+        resetFormData();
       })
       .catch(err => {
         console.error('❌ Error al enviar datos:', err);
