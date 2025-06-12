@@ -165,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('submitBtn').addEventListener('click', function () {
     const btn = this;
-
     document.querySelectorAll('.highlight-error').forEach(el => el.classList.remove('highlight-error'));
 
     const item = document.querySelectorAll('.iteamNos input')[0];
@@ -198,14 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#data-body tr.data-row').forEach((tr, idx) => {
       const tds = tr.querySelectorAll('input[type="text"]');
       const op = tds[0].value.trim();
-      const totalFila = parseInt(tds[16].value) || 0;
-
       const defectValues = Array.from(tds).slice(1, 16).map(td => parseInt(td.value) || 0);
-      const defectData = Object.fromEntries(defectKeys.map((key, i) => [key, defectValues[i]]));
+      const totalFila = parseInt(tds[16].value) || 0;
 
       const hasData = op || defectValues.some(d => d > 0) || totalFila > 0;
 
       if (hasData) {
+        const defectData = Object.fromEntries(defectKeys.map((key, i) => [key, defectValues[i]]));
         rows.push({ no: idx + 1, op, ...defectData, totalFila });
       }
     });
@@ -214,9 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('⚠️ No se ingresaron datos válidos en ninguna fila. Por favor complete al menos una fila.');
       return;
     }
-
-    const totalColumnas = Array.from(document.querySelectorAll('#column-total-row input'))
-      .map(input => parseInt(input.value) || 0);
 
     const piezasRechazadas = parseInt(document.getElementById('piezas-rechazadas').value) || 0;
     const piezasInspeccionadas = parseInt(
