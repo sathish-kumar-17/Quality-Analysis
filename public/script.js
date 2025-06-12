@@ -166,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('submitBtn').addEventListener('click', function () {
     const btn = this;
 
-    // Clear any old error styling
     document.querySelectorAll('.highlight-error').forEach(el => el.classList.remove('highlight-error'));
 
     const item = document.querySelectorAll('.iteamNos input')[0];
@@ -189,17 +188,25 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    const defectKeys = [
+      'costuraAbierta', 'embolsado', 'fueraDeMedida', 'incompleta', 'omitida',
+      'orillaCrudo', 'pliegue', 'saltos', 'defMaterial', 'arrugado',
+      'rotos', 'manchas', 'noEstandar', 'tonalidades', 'otros'
+    ];
+
     const rows = [];
     document.querySelectorAll('#data-body tr.data-row').forEach((tr, idx) => {
       const tds = tr.querySelectorAll('input[type="text"]');
       const op = tds[0].value.trim();
-      const defectos = Array.from(tds).slice(1, 16).map(td => parseInt(td.value) || 0);
       const totalFila = parseInt(tds[16].value) || 0;
 
-      const hasData = op || defectos.some(d => d > 0) || totalFila > 0;
+      const defectValues = Array.from(tds).slice(1, 16).map(td => parseInt(td.value) || 0);
+      const defectData = Object.fromEntries(defectKeys.map((key, i) => [key, defectValues[i]]));
+
+      const hasData = op || defectValues.some(d => d > 0) || totalFila > 0;
 
       if (hasData) {
-        rows.push({ no: idx + 1, op, defectos, totalFila });
+        rows.push({ no: idx + 1, op, ...defectData, totalFila });
       }
     });
 
