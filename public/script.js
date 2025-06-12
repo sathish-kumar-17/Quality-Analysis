@@ -57,53 +57,44 @@ function calculateColumnTotals() {
 }
 
 function attachInputEvents(input) {
-  input.addEventListener('focus', function () {
-    if (input.hasAttribute('data-no-arrows') || input.hasAttribute('readonly')) return;
+  if (input.hasAttribute('data-no-arrows') || input.hasAttribute('readonly')) return;
 
-    removeAllArrows();
+  // Wrap input once (not on focus)
+  const wrapper = document.createElement('div');
+  wrapper.className = 'input-wrapper';
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'input-wrapper';
+  const downBtn = document.createElement('div');
+  downBtn.className = 'input-arrow-down';
+  downBtn.textContent = '▼';
 
-    const downBtn = document.createElement('div');
-    downBtn.className = 'input-arrow-down';
-    downBtn.textContent = '▼';
+  const upBtn = document.createElement('div');
+  upBtn.className = 'input-arrow-up';
+  upBtn.textContent = '▲';
 
-    const upBtn = document.createElement('div');
-    upBtn.className = 'input-arrow-up';
-    upBtn.textContent = '▲';
+  downBtn.onclick = () => {
+    let val = parseInt(input.value) || 0;
+    input.value = Math.max(val - 1, 0);
+    calculateRowTotal(input.closest('tr'));
+    calculateColumnTotals();
+  };
 
-    downBtn.onclick = () => {
-      let val = parseInt(input.value) || 0;
-      input.value = Math.max(val - 1, 0);
-      calculateRowTotal(input.closest('tr'));
-      calculateColumnTotals();
-    };
-
-    upBtn.onclick = () => {
-      let val = parseInt(input.value) || 0;
-      input.value = val + 1;
-      calculateRowTotal(input.closest('tr'));
-      calculateColumnTotals();
-    };
-
-    input.addEventListener('input', () => {
-      if (parseInt(input.value) < 0 || isNaN(input.value)) input.value = 0;
-      calculateRowTotal(input.closest('tr'));
-      calculateColumnTotals();
-    });
-
-    input.parentNode.insertBefore(wrapper, input);
-    wrapper.appendChild(downBtn);
-    wrapper.appendChild(input);
-    wrapper.appendChild(upBtn);
-  });
+  upBtn.onclick = () => {
+    let val = parseInt(input.value) || 0;
+    input.value = val + 1;
+    calculateRowTotal(input.closest('tr'));
+    calculateColumnTotals();
+  };
 
   input.addEventListener('input', () => {
     if (parseInt(input.value) < 0 || isNaN(input.value)) input.value = 0;
     calculateRowTotal(input.closest('tr'));
     calculateColumnTotals();
   });
+
+  input.parentNode.insertBefore(wrapper, input);
+  wrapper.appendChild(downBtn);
+  wrapper.appendChild(input);
+  wrapper.appendChild(upBtn);
 }
 
 function createRow(index) {
@@ -182,11 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    if (missingRequired) {
-      alert('⚠️ Por favor complete todos los campos requeridos: Ítem, Supervisor, Inspector y Fecha.');
-      return;
-    }
-
     const defectKeys = [
       'costuraAbierta', 'embolsado', 'fueraDeMedida', 'incompleta', 'omitida',
       'orillaCrudo', 'pliegue', 'saltos', 'defMaterial', 'arrugado',
@@ -200,13 +186,23 @@ document.addEventListener('DOMContentLoaded', () => {
       const defectValues = Array.from(tds).slice(1, 16).map(td => parseInt(td.value) || 0);
       const totalFila = parseInt(tds[16].value) || 0;
 
-      const hasData = op || defectValues.some(d => d > 0) || totalFila > 0;
+      const hasData = defectValues.some(val => val > 0) || totalFila > 0;
 
       if (hasData) {
-        const defectData = Object.fromEntries(defectKeys.map((key, i) => [key, defectValues[i]]));
-        rows.push({ no: idx + 1, op, ...defectData, totalFila });
+        if (!op) {
+          tds[0].classList.add('highlight-error');
+          missingRequired = true;
+        } else {
+          const defectData = Object.fromEntries(defectKeys.map((key, i) => [key, defectValues[i]]));
+          rows.push({ no: idx + 1, op, ...defectData, totalFila });
+        }
       }
     });
+
+    if (missingRequired) {
+      alert('⚠️ Por favor ingrese el número de operador (Op) para las filas con defectos.');
+      return;
+    }
 
     if (rows.length === 0) {
       alert('⚠️ No se ingresaron datos válidos en ninguna fila. Por favor complete al menos una fila.');
