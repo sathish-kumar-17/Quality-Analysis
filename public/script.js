@@ -57,44 +57,53 @@ function calculateColumnTotals() {
 }
 
 function attachInputEvents(input) {
-  if (input.hasAttribute('data-no-arrows') || input.hasAttribute('readonly')) return;
+  input.addEventListener('focus', function () {
+    if (input.hasAttribute('data-no-arrows') || input.hasAttribute('readonly')) return;
 
-  // Wrap input once (not on focus)
-  const wrapper = document.createElement('div');
-  wrapper.className = 'input-wrapper';
+    removeAllArrows();
 
-  const downBtn = document.createElement('div');
-  downBtn.className = 'input-arrow-down';
-  downBtn.textContent = '▼';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'input-wrapper';
 
-  const upBtn = document.createElement('div');
-  upBtn.className = 'input-arrow-up';
-  upBtn.textContent = '▲';
+    const downBtn = document.createElement('div');
+    downBtn.className = 'input-arrow-down';
+    downBtn.textContent = '▼';
 
-  downBtn.onclick = () => {
-    let val = parseInt(input.value) || 0;
-    input.value = Math.max(val - 1, 0);
-    calculateRowTotal(input.closest('tr'));
-    calculateColumnTotals();
-  };
+    const upBtn = document.createElement('div');
+    upBtn.className = 'input-arrow-up';
+    upBtn.textContent = '▲';
 
-  upBtn.onclick = () => {
-    let val = parseInt(input.value) || 0;
-    input.value = val + 1;
-    calculateRowTotal(input.closest('tr'));
-    calculateColumnTotals();
-  };
+    downBtn.onclick = () => {
+      let val = parseInt(input.value) || 0;
+      input.value = Math.max(val - 1, 0);
+      calculateRowTotal(input.closest('tr'));
+      calculateColumnTotals();
+    };
+
+    upBtn.onclick = () => {
+      let val = parseInt(input.value) || 0;
+      input.value = val + 1;
+      calculateRowTotal(input.closest('tr'));
+      calculateColumnTotals();
+    };
+
+    input.addEventListener('input', () => {
+      if (parseInt(input.value) < 0 || isNaN(input.value)) input.value = 0;
+      calculateRowTotal(input.closest('tr'));
+      calculateColumnTotals();
+    });
+
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(downBtn);
+    wrapper.appendChild(input);
+    wrapper.appendChild(upBtn);
+  });
 
   input.addEventListener('input', () => {
     if (parseInt(input.value) < 0 || isNaN(input.value)) input.value = 0;
     calculateRowTotal(input.closest('tr'));
     calculateColumnTotals();
   });
-
-  input.parentNode.insertBefore(wrapper, input);
-  wrapper.appendChild(downBtn);
-  wrapper.appendChild(input);
-  wrapper.appendChild(upBtn);
 }
 
 function createRow(index) {
