@@ -4,16 +4,6 @@ function autoExpandInput(input) {
   input.style.width = (input.scrollWidth + extraPadding) + 'px';
 }
 
-function removeAllArrows() {
-  document.querySelectorAll('input[type="text"]').forEach(input => {
-    const parent = input.parentNode;
-    if (parent && parent.classList.contains('input-wrapper')) {
-      parent.parentNode.insertBefore(input, parent);
-      parent.remove();
-    }
-  });
-}
-
 function calculateRowTotal(row) {
   const inputs = row.querySelectorAll('td input[type="text"]:not([readonly]):not([data-no-arrows])');
   let sum = 0;
@@ -149,8 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
   tbody.appendChild(createFinalRow());
 
   document.addEventListener('click', (e) => {
-    if (!e.target.matches('input[type="text"], .input-arrow-up, .input-arrow-down')) {
-      removeAllArrows();
+    document.querySelectorAll('.input-wrapper').forEach(wrapper => wrapper.classList.remove('active'));
+    if (e.target.matches('input[type="text"]')) {
+      const wrapper = e.target.closest('.input-wrapper');
+      if (wrapper) wrapper.classList.add('active');
     }
   });
 
@@ -185,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const op = tds[0].value.trim();
       const defectValues = Array.from(tds).slice(1, 16).map(td => parseInt(td.value) || 0);
       const totalFila = parseInt(tds[16].value) || 0;
-
       const hasData = defectValues.some(val => val > 0) || totalFila > 0;
 
       if (hasData) {
